@@ -6,30 +6,6 @@ on:
       - main
 
 jobs:
-  deploy-frontend:
-    runs-on: ubuntu-latest
-    defaults:
-        run:
-            working-directory: frontend
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'  # Node.js 버전 설정
-
-      - name: Install frontend dependencies
-        run: npm install
-
-      - name: Build frontend
-        run: npm run build
-
-      - name : Deploy to S3
-        run : aws s3 sync build/ s3://react-wook-bucket --delete
-
   build-backend:
     runs-on: ubuntu-latest
     env:
@@ -46,9 +22,8 @@ jobs:
         with:
           python-version: '3.10'  # Python 버전 설정
 
-      - name: Install backend dependencies
+      - name: Install ec2-mlops dependencies
         run: |
-          cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
