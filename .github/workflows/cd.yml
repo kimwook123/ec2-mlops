@@ -1,9 +1,9 @@
-name: CD
+name: CD to EC2
 
 on:
   push:
     branches:
-      - main
+      - main  # main 브랜치에 푸시될 때만 실행
 
 jobs:
   build-backend:
@@ -22,7 +22,19 @@ jobs:
         with:
           python-version: '3.10'  # Python 버전 설정
 
-      - name: Install ec2-mlops dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Deploy to EC2
+        run: |
+          # EC2 인스턴스에 SSH로 접속하여 코드를 배포
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh -i "kimwook-keypair.pem" ec2-user@ec2-43-203-243-7.ap-northeast-2.compute.amazonaws.com << EOF
+            cd /home/user/MLops_practive/practice0930/ec2-mlops
+            git pull origin main
+            pip install -r requirements.txt
+            systemctl restart your-service  # 시스템 서비스를 재시작
+          EOF
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}  # GitHub Secrets에 SSH 키 저장
